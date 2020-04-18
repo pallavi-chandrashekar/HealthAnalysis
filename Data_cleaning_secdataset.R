@@ -101,6 +101,7 @@ dataset$State <- sub("wyoming - [a-z0-9]* [a-z0-9]*", "WY", dataset$State)
 #Since, all the crime values are in integers, they can be replaced with 0's
 
 dataset[is.na(dataset)] <- 0
+write.csv(dataset,"C:/Users/Priyanka/Desktop/DPA/Project/secondarydataset_cleaned.csv", row.names = TRUE)
 
 #Totalling crimes in each county
 
@@ -125,7 +126,7 @@ for( j in 1: nrow(finalrank)){
 
 #Sorting and ranking
 finalrank$rank <- rank(finalrank$total_crime, ties.method = "min")
-
+write.csv(finalrank,"C:/Users/Priyanka/Desktop/DPA/Project/final_rank.csv", row.names = TRUE)
 
 
 
