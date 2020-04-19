@@ -24,7 +24,7 @@ other <- c("trans-female", "something kinda male?", "queer/she/they", "non-binar
 #Find the mistakes and replace
 
 new_survey <- survey
-for(i in 2:nrow(survey)){
+for(i in 1:nrow(survey)){
   if(survey$Gender[i] %in% male == TRUE | survey$Gender[i]=="Male"){
     new_survey$Gender[i]<- 'M'
   }
@@ -104,3 +104,38 @@ barplot(counts, main="Size of company and Employer providing health",
         xlab="Age", ylab ="Willing to discuss with coworkers",col=c("darkblue","red","green")
         ,beside=FALSE,
         legend.text = c("Yes", "No","NA"),args.legend = list(x = "topright"))
+  
+# Reordering dataset to make predicting column to be last
+
+new_survey <- new_survey[, c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,24,25,15)]
+new_survey <- mutate_if(new_survey, is.character, as.factor)
+
+
+# Handling the factor levels 
+
+new_survey$work_interfere <- factor(new_survey$work_interfere, levels = c("Never", "Rarely", "Sometimes", "Often"))
+new_survey$benefits <- factor(new_survey$benefits, levels = c("No", "Don't know", "Yes"))
+new_survey$wellness_program <- factor(new_survey$wellness_program, levels = c("No", "Don't know", "Yes"))
+new_survey$anonymity <- factor(new_survey$anonymity, levels = c("No", "Don't know", "Yes"))
+new_survey$leave <- factor(new_survey$leave, levels = c("Don't know", "Very difficult", "Somewhat difficult" , "Somewhat easy" , "Very easy"))
+new_survey$phys_health_consequence <- factor(new_survey$phys_health_consequence, levels = c("No", "Maybe", "Yes"))
+new_survey$mental_health_interview <- factor(new_survey$mental_health_interview, levels = c("No", "Maybe", "Yes"))
+new_survey$mental_vs_physical <- factor(new_survey$mental_vs_physical, levels = c("No", "Don't know", "Yes"))
+new_survey$seek_help <- factor(new_survey$seek_help, levels = c("No", "Don't know", "Yes"))
+
+#  Splitting data into test and train,
+
+set.seed(101) 
+sample <- sample.int(n = nrow(new_survey), size = floor(.80*nrow(new_survey)), replace = F)
+train <- new_survey[sample, ]
+test  <- new_survey[-sample, ]
+
+# Feature selection
+library('randomForest')
+
+# Using random forest for variable selection
+rfModel <- randomForest(seek_help ~ ., data = train, na.action = na.roughfix)
+
+# Getting the list of important variables
+importance(rfModel)
+# We will drop variables with mean decrease in Gini < 10
