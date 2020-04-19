@@ -106,8 +106,9 @@ barplot(counts, main="Size of company and Employer providing health",
         legend.text = c("Yes", "No","NA"),args.legend = list(x = "topright"))
   
 # Reordering dataset to make predicting column to be last
+# Converting char columns to factors
 
-new_survey <- new_survey[, c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,24,25,15)]
+new_survey <- new_survey[, c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,16,17,18,19,20,21,22,23,24,25,15)]    
 new_survey <- mutate_if(new_survey, is.character, as.factor)
 
 
