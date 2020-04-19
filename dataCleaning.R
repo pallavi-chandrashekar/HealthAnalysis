@@ -48,18 +48,27 @@ write.csv(new_survey, "C:/Users/i513930/Desktop/My/CSP571/Project/new_survey.csv
 #How does the size of a company relate to an employer formally discussing mental health
 
 counts <- table(new_survey$wellness_program, new_survey$no_employees)
-barplot(counts, main="Size of company and Employer providing health",
-        xlab="Number of Employees", ylab ="Employer providing health",col=c("darkblue","red","green")
+barplot(counts, main="Does the employer discuss mental health issues, based on the size of the company",
+        xlab="Number of Employees", ylab ="Employer discusses mental health",col=c("#3780c4","#c94426","#68a819")
         ,beside=TRUE,legend.text = c("Yes", "No","NA"))
 
+#How does the age of an employee relate to their comfort in discussing mental health issues with their supervisor
+
+g2 <- ggplot(new_survey, aes(Age))
+g2 + geom_bar(aes(fill=supervisor),width = 0.5) + 
+  theme(axis.text.x = element_text(angle=45, vjust=0.5)) + 
+  labs(title="Comfortable discussing issues with Supervisors according to age")+
+  scale_fill_manual(values=c("#3780c4","#c94426","#68a819"))+
+  ylab("")+
+  labs(fill='Legend')
+
 #How does the age of an employee relate to their comfort in discussing mental health issues with their peers
-counts <- table(new_survey$supervisor, new_survey$Age)
-barplot(counts, main="Size of company and Employer providing health",
-        xlab="Age", ylab ="Willing to discuss with coworkers",col=c("darkblue","red","green")
-        ,beside=FALSE,
-        legend.text = c("Yes", "No","NA"),args.legend = list(x = "topright"))
-
-
+g2 + geom_bar(aes(fill=coworkers),width = 0.5) + 
+  theme(axis.text.x = element_text(angle=65, vjust=0.6)) + 
+  labs(title="Comfortable discussing issues with coworkers according to age")+
+  scale_fill_manual(values=c("#3780c4","#c94426","#68a819"))+
+  ylab("")+
+  labs(fill='Legend')
 
 #which part of the world are most affected.
 
@@ -80,16 +89,20 @@ grouped_countries <- fct_collapse(new_survey$Region,
                                   )
 
 fct_count(grouped_countries,sort = TRUE)
-
 #US is most affected then other Regions
 
 
 #Does the employer provide mental health benefits
-counts <- table(new_survey$benefits)
-barplot(counts, main="Employer providing benfits",
-        xlab="Health benefits", ylab ="Employer",col=c("darkblue","red","green")
-        ,beside=TRUE)
+g2 <- ggplot(new_survey, aes(benefits))
 
+g2 + geom_bar(aes(fill=benefits),width = 0.5) + 
+  theme(axis.text.x = element_text(angle=45, vjust=0.5)) + 
+  labs(title="Does the employer provide mental health benefits")+
+  scale_fill_manual(values=c("#3780c4","#c94426","#68a819"))+
+  xlab("Benefits")+
+  ylab("")+
+  labs(fill='Legend')
+  
 #What Type of companies has more mental health issues
 counts <- table(new_survey$tech_company)
 barplot(counts, main="",
@@ -97,13 +110,6 @@ barplot(counts, main="",
         ,beside=TRUE)
 
 
-#Are the employees comfortable talking about mental health with their coworkers.
-
-counts <- table(new_survey$coworkers, new_survey$Age)
-barplot(counts, main="Size of company and Employer providing health",
-        xlab="Age", ylab ="Willing to discuss with coworkers",col=c("darkblue","red","green")
-        ,beside=FALSE,
-        legend.text = c("Yes", "No","NA"),args.legend = list(x = "topright"))
   
 # Reordering dataset to make predicting column to be last
 # Converting char columns to factors
