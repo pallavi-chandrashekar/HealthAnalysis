@@ -184,6 +184,7 @@ dataVisualize_geomBar<- function(data,aesValue,fillValue,angleValue,vjustValue,t
     g2 + geom_bar(aes(fill=fillValue),width = 0.5) + 
     theme(axis.text.x = element_text(angle=angleValue, vjust=vjustValue)) + 
     labs(title=titleValue)+
+    facet_grid(~ fillValue)+
     scale_fill_manual(values=c("#3780c4","#c94426","#68a819"))+
     ylab("")+
     labs(fill='Legend')
