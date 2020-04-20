@@ -57,6 +57,7 @@ barplot(counts, main="Does the employer discuss mental health issues, based on t
 g2 <- ggplot(new_survey, aes(Age))
 g2 + geom_bar(aes(fill=supervisor),width = 0.5) + 
   theme(axis.text.x = element_text(angle=45, vjust=0.5)) + 
+  facet_grid(~ supervisor)+
   labs(title="Comfortable discussing issues with Supervisors according to age")+
   scale_fill_manual(values=c("#3780c4","#c94426","#68a819"))+
   ylab("")+
@@ -65,6 +66,7 @@ g2 + geom_bar(aes(fill=supervisor),width = 0.5) +
 #How does the age of an employee relate to their comfort in discussing mental health issues with their peers
 g2 + geom_bar(aes(fill=coworkers),width = 0.5) + 
   theme(axis.text.x = element_text(angle=65, vjust=0.6)) + 
+  facet_grid(~ coworkers)+
   labs(title="Comfortable discussing issues with coworkers according to age")+
   scale_fill_manual(values=c("#3780c4","#c94426","#68a819"))+
   ylab("")+
