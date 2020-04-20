@@ -12,6 +12,7 @@ library(randomForest)
 library(caret)
 }
 
+basePath <- "C:/Users/Mayank Phadke/Documents/College/DPA/HealthAnalysis/"
 
 correctTheData<- function(data){
   #define the mistakes
@@ -49,21 +50,21 @@ correctTheData<- function(data){
   return(new_survey)
 }
 cleanDataSet2014 <- function(){
-  survey <- read.csv("C:/Users/i513930/Desktop/My/CSP571/Project/survey.csv",stringsAsFactors = F)
+  survey <- read.csv(paste(basePath, "survey.csv", sep = ""),stringsAsFactors = F)
   
   #Correcting the spelling of Gender and replace the negative and values more than 65 with median of age
   new_survey <- correctTheData(survey)
   new_survey$state<-NULL
   
   #write the cleaned data to csv
-  write.csv(new_survey, "C:/Users/i513930/Desktop/My/CSP571/Project/new_survey.csv", row.names = F)
+  write.csv(new_survey, paste(basePath, "new_survey.csv", sep = ""), row.names = F)
   return(new_survey)
 }
 
 cleanDataSet2016 <- function(){
   # read the csv
   survey <- read.csv(
-    "C:/Users/i513930/Desktop/My/CSP571/Project/survey2016.csv",
+    paste(basePath, "survey2016.csv", sep = ""),
     stringsAsFactors = F)
   
   col_names <- c(
@@ -181,7 +182,7 @@ cleanDataSet2016 <- function(){
       return("Yes")
   )
   
-  write.csv(new_survey, "C:/Users/i513930/Desktop/My/CSP571/Project/new_survey2016.csv", row.names = FALSE)
+  write.csv(new_survey, paste(basePath, "new_survey2016.csv", sep = ""), row.names = FALSE)
   return(new_survey)
 }
 
@@ -402,11 +403,11 @@ legend(0.5, 0.2, legend = c("Random Forest", "Logistic Regression"), col = c("#3
 
 
 #with ranking Random Forest 
-survey <- read.csv("C:/Users/i513930/Desktop/My/CSP571/Project/survey.csv",stringsAsFactors = F)
+survey <- read.csv(paste(basePath, "survey.csv", sep = ""),stringsAsFactors = F)
 final_rank<-correctTheData(survey)
-rank_values<- read.csv("C:/Users/i513930/Desktop/My/CSP571/Project/rankvalues.csv",stringsAsFactors = TRUE)
+rank_values<- read.csv(paste(basePath, "rankvalues.csv", sep = ""),stringsAsFactors = TRUE)
 
-final_rank$rank<- rank_values$ï..rank
+final_rank$rank<- rank_values$ï¿½..rank
 final_rank$rank <- factor(final_rank$rank, levels = c("NA","1", "6", "7", "8","10","11","12","13","15","16","17","18","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","38","39","40","41","42","43","44","45","46","47","48","49","50"))
 final_rank<- whichPartOfWorldIsMostAffected(final_rank)
 final_rank$state <- factor(final_rank$state, levels=c("NA","AL","AZ","AR","CA","CO","CT","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"))
@@ -415,8 +416,8 @@ listdata = divideData(final_rank)
 print(paste("Data is divided as Train and Test :",nrow(listdata$train),",",nrow(listdata$test)))
 
 
-
 rf_value = randomForestMethod(listdata$train)
+saveRDS(rf_value, file = "model.rds")
 
 rf_predictValue = predictmethod(rf_value,listdata$test,"class")
 rf_pValue = prediction(as.numeric(rf_pred1),as.numeric(listdata$test$treatment))
