@@ -274,6 +274,7 @@ reorderingData<- function(data){
   data$mental_vs_physical <- factor(data$mental_vs_physical, levels = c("No", "Don't know", "Yes"))
   data$seek_help <- factor(data$seek_help, levels = c("No", "Don't know", "Yes"))
   data$Region <- factor(data$Region, levels=c("US","Europe","NorthAmerica_other","Oceana","Asia","South_Central_America","Africa"))
+  data$no_employees<- factor(data$no_employees, levels=c("NA","1 to 5","6 to 25","26 to 100","100 to 500","500 to 1000","More than 1000"))
   #data$state <- factor(data$state, levels=c("NA","AL","AK","AZ","AR","CA","CO","CT","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"))
   return(data)
 }
@@ -388,7 +389,7 @@ recallValue_lg =recall(tableforlg)
 precisionValue_lg = precision(tableforlg)
 f_lg = F_meas(tableforlg)
 
-print(paste("Precision and recall and F1 score values for Random forest: ",precisionValue_lg,",",recallValue_lg,",",f_lg))
+print(paste("Precision and recall and F1 score values for Logistic Regression: ",precisionValue_lg,",",recallValue_lg,",",f_lg))
 
 
 
@@ -400,12 +401,12 @@ axis(side=2,at=seq(0,1,.1))
 legend(0.5, 0.2, legend = c("Random Forest", "Logistic Regression"), col = c("#3780c4", "#c94426"), lty = 1:1, cex = 0.5)
 
 
-#with ranking Logistic Regression 
+#with ranking Random Forest 
 survey <- read.csv("C:/Users/i513930/Desktop/My/CSP571/Project/survey.csv",stringsAsFactors = F)
 final_rank<-correctTheData(survey)
 rank_values<- read.csv("C:/Users/i513930/Desktop/My/CSP571/Project/rankvalues.csv",stringsAsFactors = TRUE)
 
-final_rank$rank<- rank_values$Ã¯..rank
+final_rank$rank<- rank_values$ï..rank
 final_rank$rank <- factor(final_rank$rank, levels = c("NA","1", "6", "7", "8","10","11","12","13","15","16","17","18","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","38","39","40","41","42","43","44","45","46","47","48","49","50"))
 final_rank<- whichPartOfWorldIsMostAffected(final_rank)
 final_rank$state <- factor(final_rank$state, levels=c("NA","AL","AZ","AR","CA","CO","CT","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"))
@@ -470,3 +471,6 @@ rf_cf_2016 = confusionMatrix(rf_predictValue_2016, listdata_2016$test$treatment)
 rf_error_2016 = calError(rf_cf_2016)
 
 print(paste("Error for RandomForest for 2016 dataset :",rf_error_2016))
+
+
+varImpPlot(rf_value_2016, sort=T)
