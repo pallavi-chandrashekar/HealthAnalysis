@@ -1,5 +1,4 @@
 #define the functions
-
 #libraries required
 loadlibraries <-function(){
 library(dplyr)
@@ -10,9 +9,16 @@ library(ggplot2)
 library(tree)
 library(randomForest)
 library(caret)
+library(plyr)
+library(class)
+library(rpart)
+library(maptree)
+library(ROCR)
+library(dplyr)
+library(glmnet)
+library(forcats)
 }
 
-basepath <- "C:/Users/Mayank Phadke/Documents/College/DPA/HealthAnalysis"
 
 correctTheData<- function(data){
   #define the mistakes
@@ -50,21 +56,21 @@ correctTheData<- function(data){
   return(new_survey)
 }
 cleanDataSet2014 <- function(){
-  survey <- read.csv(paste(basepath, "/survey.csv", sep = ""),stringsAsFactors = F)
+  survey <- read.csv("C:/Users/i513930/Desktop/My/CSP571/Project/survey.csv",stringsAsFactors = F)
   
   #Correcting the spelling of Gender and replace the negative and values more than 65 with median of age
   new_survey <- correctTheData(survey)
   new_survey$state<-NULL
   
   #write the cleaned data to csv
-  write.csv(new_survey, paste(basepath, "/new_survey.csv", sep = ""), row.names = F)
+  write.csv(new_survey, "C:/Users/i513930/Desktop/My/CSP571/Project/new_survey.csv", row.names = F)
   return(new_survey)
 }
 
 cleanDataSet2016 <- function(){
   # read the csv
   survey <- read.csv(
-    paste(basepath, "/survey2016.csv", sep = ""),
+    "C:/Users/i513930/Desktop/My/CSP571/Project/survey2016.csv",
     stringsAsFactors = F)
   
   col_names <- c(
@@ -182,7 +188,7 @@ cleanDataSet2016 <- function(){
       return("Yes")
   )
   
-  write.csv(new_survey, paste(basepath, "/new_survey2016.csv", sep = ""), row.names = FALSE)
+  write.csv(new_survey, "C:/Users/i513930/Desktop/My/CSP571/Project/new_survey2016.csv", row.names = FALSE)
   return(new_survey)
 }
 
@@ -290,18 +296,31 @@ divideData<- function(data){
   return(result)
 }
 
+
+decisiontreeMethod <- function(dataSet){
+  dt_para <- tree.control(nobs=nrow(dataSet), 
+                                 minsize=5, 
+                                 mindev=1e-3)
+  treeval =tree(treatment~., 
+                    data = dataSet, 
+                    control= dt_para)
+  summary(treeval)
+  draw.tree(treeval, cex=0.65 ,nodeinfo=TRUE)
+  return(treeval)
+  
+}
 randomForestMethod<- function(dataSet){
   set.seed(1)
   survey_rf <- randomForest(treatment~., 
                             data=dataSet,
                             importance=T, 
-                            na.action = na.roughfix)
+                            na.action = na.omit)
   summary(survey_rf)
   return(survey_rf)
 }
 
 predictmethod<- function(data,newdataValue,typeValue){
-  return(predict(data, newdata = newdataValue,na.action = na.roughfix,type= typeValue))
+  return(predict(data, newdata = newdataValue,type= typeValue))
 }
 
 confusionMatrix<- function(predictedValue, actualValue){
@@ -314,15 +333,16 @@ calError<- function(data){
 
 
 logReg<- function(dataSet){
-  return(glm(treatment ~ ., data=dataSet,na.action = na.exclude,family="binomial"))
+  return(glm(treatment ~ ., data=dataSet,family="binomial"))
 }
 calPerformance<- function(predValue){
   return(performance(predValue, measure="tpr", x.measure="fpr"))
 }
 
 predictmethodforlg<- function(data,newdataValue,typeValue){
-  return(predict(data, newdata = newdataValue,na.action = na.exclude,type= typeValue))
+  return(predict(data, newdata = newdataValue,type= typeValue))
 }
+
 
 #function calls for 2014 dataset
 loadlibraries()
@@ -342,8 +362,9 @@ new_survey= reorderingData(new_survey)
 listdata = divideData(new_survey)
 print(paste("Data is divided as Train and Test :",nrow(listdata$train),",",nrow(listdata$test)))
 
-#model
-#1. randomForest method
+#models
+
+#2. randomForest method
 rf_value = randomForestMethod(listdata$train)
 
 rf_predictValue = predictmethod(rf_value,listdata$test,"class")
@@ -365,7 +386,7 @@ f_rf = F_meas(tableforRf)
 
 print(paste("Precision and recall and F1 score values for Random forest: ",precisionValue_rf,",",recallValue_rf,",",f_rf))
 
-#2. Logistic Regression
+#3. Logistic Regression
 
 lg_value = logReg(listdata$train)
 lg_predictValue = predictmethodforlg(lg_value, listdata$test,"response")
@@ -375,7 +396,7 @@ lg_performance = calPerformance(lg_pValue)
 
 # Save the predicted labels using 0.5 as a threshold
 lg_test <-  listdata$test %>%
-  mutate(predTreatment=as.factor(ifelse(lg_predictValue<=0.5, "No", "Yes")))
+  mutate(predTreatment=as.factor(ifelse(lg_predictValue<=0.25, "No", "Yes")))
 
 lg_cf = confusionMatrix(lg_test$predTreatment,lg_test$treatment)
 
@@ -390,7 +411,7 @@ recallValue_lg =recall(tableforlg)
 precisionValue_lg = precision(tableforlg)
 f_lg = F_meas(tableforlg)
 
-#print(paste("Precision and recall and F1 score values for Logistic Regression: ",precisionValue_lg,",",recallValue_lg,",",f_lg))
+print(paste("Precision and recall and F1 score values for Logistic Regression: ",precisionValue_lg,",",recallValue_lg,",",f_lg))
 
 
 
@@ -403,11 +424,11 @@ legend(0.5, 0.2, legend = c("Random Forest", "Logistic Regression"), col = c("#3
 
 
 #with ranking Random Forest 
-survey <- read.csv(paste(basepath, "/survey.csv", sep = ""),stringsAsFactors = F)
+survey <- read.csv("C:/Users/i513930/Desktop/My/CSP571/Project/survey.csv",stringsAsFactors = F)
 final_rank<-correctTheData(survey)
-rank_values<- read.csv(paste(basepath, "/rankvalues.csv", sep = ""),stringsAsFactors = TRUE)
+rank_values<- read.csv("C:/Users/i513930/Desktop/My/CSP571/Project/rankvalues.csv",stringsAsFactors = TRUE)
 
-final_rank$rank<- rank_values$ï¿½..rank
+final_rank$rank<- rank_values$ï..rank
 final_rank$rank <- factor(final_rank$rank, levels = c("NA","1", "6", "7", "8","10","11","12","13","15","16","17","18","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","38","39","40","41","42","43","44","45","46","47","48","49","50"))
 final_rank<- whichPartOfWorldIsMostAffected(final_rank)
 final_rank$state <- factor(final_rank$state, levels=c("NA","AL","AZ","AR","CA","CO","CT","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"))
@@ -428,7 +449,7 @@ rf_error = calError(rf_cf)
 
 print(paste("Error for RandomForest with Rank :",rf_error))
 
-varImpPlot(rf_value, sort=T)
+varImpPlot(rf_value)
 
 tableforRf <- table(rf_predictValue,listdata$test$treatment )
 recallValue_rf =recall(tableforRf)
