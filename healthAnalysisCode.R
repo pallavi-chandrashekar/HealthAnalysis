@@ -24,7 +24,7 @@ correctTheData<- function(data){
   #define the mistakes
   
   male <- c("male", "m", "male-ish", "maile", "mal", "male (cis)", "make", "male ", "man","msle", "mail", "malr","cis man", "Male", "Male ", "Male-ish", "Male (CIS)", "Man", "Mal", "Make", "cis male", "Malr", "M", "Cis Male", "Mail", "Cis Man", "M")
-  female <- c("cis female", "f", "female", "woman",  "femake", "female ","cis-female/femme", "female (cis)", "femail", "Female", "Female ", "Cis Female", "Femake", "Woman", "Female (cis)")
+  female <- c("cis female", "f", "female", "woman",  "femake", "female ","cis-female/femme", "female (cis)", "femail", "Female ", "Cis Female", "Femake", "Woman", "Female (cis)")
   other <- c("trans-female", "something kinda male?", "queer/she/they", "non-binary","nah", "all", "enby", "fluid", "genderqueer", "androgyne", "agender", "male leaning androgynous", "Guy (-ish) ^_^", "trans woman", "neuter", "female (trans)", "queer", "ostensibly male, unsure what that really means", "Enby", "Agender", "Trans woman", "p", "All", "Guy (-ish) ^_^", "A little about you", "Nah", "Genderqueer", "Androgyne", "Female (trans)", "Neuter", "Trans-female" )
   
   #Find the mistakes and replace
@@ -56,21 +56,21 @@ correctTheData<- function(data){
   return(new_survey)
 }
 cleanDataSet2014 <- function(){
-  survey <- read.csv("C:/Users/i513930/Desktop/My/CSP571/Project/survey.csv",stringsAsFactors = F)
+  survey <- read.csv("C:/Users/Desktop/My/CSP571/Project/survey.csv",stringsAsFactors = F)
   
   #Correcting the spelling of Gender and replace the negative and values more than 65 with median of age
   new_survey <- correctTheData(survey)
   new_survey$state<-NULL
   
   #write the cleaned data to csv
-  write.csv(new_survey, "C:/Users/i513930/Desktop/My/CSP571/Project/new_survey.csv", row.names = F)
+  write.csv(new_survey, "C:/Users/Desktop/My/CSP571/Project/new_survey.csv", row.names = F)
   return(new_survey)
 }
 
 cleanDataSet2016 <- function(){
   # read the csv
   survey <- read.csv(
-    "C:/Users/i513930/Desktop/My/CSP571/Project/survey2016.csv",
+    "C:/Users/Desktop/My/CSP571/Project/survey2016.csv",
     stringsAsFactors = F)
   
   col_names <- c(
@@ -188,7 +188,7 @@ cleanDataSet2016 <- function(){
       return("Yes")
   )
   
-  write.csv(new_survey, "C:/Users/i513930/Desktop/My/CSP571/Project/new_survey2016.csv", row.names = FALSE)
+  write.csv(new_survey, "C:/Users/Desktop/My/CSP571/Project/new_survey2016.csv", row.names = FALSE)
   return(new_survey)
 }
 
@@ -297,18 +297,7 @@ divideData<- function(data){
 }
 
 
-decisiontreeMethod <- function(dataSet){
-  dt_para <- tree.control(nobs=nrow(dataSet), 
-                                 minsize=5, 
-                                 mindev=1e-3)
-  treeval =tree(treatment~., 
-                    data = dataSet, 
-                    control= dt_para)
-  summary(treeval)
-  draw.tree(treeval, cex=0.65 ,nodeinfo=TRUE)
-  return(treeval)
-  
-}
+
 randomForestMethod<- function(dataSet){
   set.seed(1)
   survey_rf <- randomForest(treatment~., 
@@ -424,9 +413,9 @@ legend(0.5, 0.2, legend = c("Random Forest", "Logistic Regression"), col = c("#3
 
 
 #with ranking Random Forest 
-survey <- read.csv("C:/Users/i513930/Desktop/My/CSP571/Project/survey.csv",stringsAsFactors = F)
+survey <- read.csv("C:/Users/Desktop/My/CSP571/Project/survey.csv",stringsAsFactors = F)
 final_rank<-correctTheData(survey)
-rank_values<- read.csv("C:/Users/i513930/Desktop/My/CSP571/Project/rankvalues.csv",stringsAsFactors = TRUE)
+rank_values<- read.csv("C:/Users/Desktop/My/CSP571/Project/rankvalues.csv",stringsAsFactors = TRUE)
 
 final_rank$rank<- rank_values$ï..rank
 final_rank$rank <- factor(final_rank$rank, levels = c("NA","1", "6", "7", "8","10","11","12","13","15","16","17","18","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","38","39","40","41","42","43","44","45","46","47","48","49","50"))
@@ -496,3 +485,5 @@ print(paste("Error for RandomForest for 2016 dataset :",rf_error_2016))
 
 
 varImpPlot(rf_value_2016, sort=T)
+
+
